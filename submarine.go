@@ -5,9 +5,15 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
-func getInput(inputFile string) []int {
+type movement struct {
+	direction string
+	distance  int
+}
+
+func getIntsFromFile(inputFile string) []int {
 
 	fileContents := []int{}
 
@@ -24,6 +30,30 @@ func getInput(inputFile string) []int {
 		}
 	}
 
+	return fileContents
+}
+
+func getMovementsFromFile(inputFile string) []movement {
+
+	fileContents := []movement{}
+
+	file, err := os.Open(inputFile)
+	defer file.Close()
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		scanner := bufio.NewScanner(file)
+		var i = 0
+		tmpMovement := movement{}
+		for scanner.Scan() {
+			input := strings.Fields(scanner.Text())
+			tmpMovement.direction = input[0]
+			tmpMovement.distance, _ = strconv.Atoi(input[1])
+			fileContents = append(fileContents, tmpMovement)
+			i += 1
+		}
+	}
 	return fileContents
 }
 
@@ -60,13 +90,39 @@ func CountDepthWindowIncreases(measurements []int, windowSize int) int {
 	return numDepthWindowIncreases
 }
 
+func MoveSubmarine(courseEntries []movement) (int, int) {
+
+	var horizontalMovement = 0
+	var verticalMovement = 0
+
+	for _, m := range courseEntries {
+		if m.direction == "forward" {
+			horizontalMovement += m.distance
+		} else {
+			if m.direction == "down" {
+				verticalMovement += m.distance
+			} else {
+				verticalMovement -= m.distance
+			}
+		}
+	}
+	return horizontalMovement, verticalMovement
+
+}
+
 func main() {
 
-	inputValues := getInput("./day_1_input.txt")
-	// fmt.Print(inputValues)
-	numDepthIncreases := CountDepthIncreases(inputValues)
-	fmt.Printf("Found %d number of depth increases", numDepthIncreases)
-	numDepthWindowIncreases := CountDepthWindowIncreases(inputValues, 3)
-	fmt.Printf("Found %d number of depth increases", numDepthWindowIncreases)
+	day_1_inputValues := getIntsFromFile("./day_1_input.txt")
+	day_2_inputValues := getMovementsFromFile("./day_2_input.txt")
+	// day 1
+	numDepthIncreases := CountDepthIncreases(day_1_inputValues)
+	fmt.Printf("\nFound %d number of depth increases", numDepthIncreases)
+	numDepthWindowIncreases := CountDepthWindowIncreases(day_1_inputValues, 3)
+	fmt.Printf("\nFound %d number of depth increases", numDepthWindowIncreases)
+
+	// day 2
+	horizontalMovement, verticalMovement := MoveSubmarine(day_2_inputValues)
+	fmt.Printf("\nMultiplier value for movement: %d",
+		(horizontalMovement * verticalMovement))
 
 }
