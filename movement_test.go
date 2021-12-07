@@ -20,24 +20,22 @@ var movementInput = []movement{
 	{"forward", 2},
 }
 
-var expectedHorizontalMovement = 15
-var expectedVerticalMovement = 10
-var expectedMultiplierOutput = 150
+var expectedHorizontalMovementWithAim = 15
+var expectedVerticalMovementWithAim = 60
+var expectedMultiplierOutputWithAim = 900
 
-func TestPositionCalculatoin(t *testing.T) {
-
-	horizontalMovement, verticalMovement := MoveSubmarine(movementInput)
-	if horizontalMovement != expectedHorizontalMovement {
+func TestPositionCalculationUsingAim(t *testing.T) {
+	horizontalMovementWithAim, verticalMovementWithAim := MoveSubmarine(movementInput)
+	if horizontalMovementWithAim != expectedHorizontalMovementWithAim {
 		t.Errorf("expected %d, but got %d",
-			expectedHorizontalMovement, horizontalMovement)
+			expectedHorizontalMovementWithAim, horizontalMovementWithAim)
 	}
-	if verticalMovement != expectedVerticalMovement {
+	if verticalMovementWithAim != expectedVerticalMovementWithAim {
 		t.Errorf("expected %d, but got %d",
-			expectedVerticalMovement, verticalMovement)
+			expectedVerticalMovementWithAim, verticalMovementWithAim)
 	}
-	if (horizontalMovement * verticalMovement) !=  expectedMultiplierOutput {
+	if (horizontalMovementWithAim * verticalMovementWithAim) !=  expectedMultiplierOutputWithAim {
 		t.Errorf("expected %d, but got %d",
-			expectedMultiplierOutput, (horizontalMovement * verticalMovement))
-
+			expectedMultiplierOutputWithAim, (horizontalMovementWithAim * verticalMovementWithAim))
 	}
 }

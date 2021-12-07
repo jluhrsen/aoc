@@ -59,6 +59,7 @@ func getMovementsFromFile(inputFile string) []movement {
 
 func CountDepthIncreases(measurements []int) int {
 	var numDepthIncreases = 0
+
 	for idx, m := range measurements {
 		if idx == len(measurements) - 1 {
 			break
@@ -93,20 +94,22 @@ func CountDepthWindowIncreases(measurements []int, windowSize int) int {
 func MoveSubmarine(courseEntries []movement) (int, int) {
 
 	var horizontalMovement = 0
-	var verticalMovement = 0
+	var totalVerticalMovement = 0
+	var aim = 0
 
 	for _, m := range courseEntries {
 		if m.direction == "forward" {
 			horizontalMovement += m.distance
+			totalVerticalMovement += aim * m.distance
 		} else {
 			if m.direction == "down" {
-				verticalMovement += m.distance
+				aim += m.distance
 			} else {
-				verticalMovement -= m.distance
+				aim -= m.distance
 			}
 		}
 	}
-	return horizontalMovement, verticalMovement
+	return horizontalMovement, totalVerticalMovement
 
 }
 
