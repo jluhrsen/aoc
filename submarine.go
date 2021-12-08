@@ -13,6 +13,11 @@ type movement struct {
 	distance  int
 }
 
+type diagCounter struct {
+	onesCount int
+	zerosCount int
+}
+
 func getIntsFromFile(inputFile string) []int {
 
 	fileContents := []int{}
@@ -26,6 +31,26 @@ func getIntsFromFile(inputFile string) []int {
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
 			line, _ :=	strconv.Atoi(scanner.Text())
+			fileContents = append(fileContents, line)
+		}
+	}
+
+	return fileContents
+}
+
+func getDiagnosticsFromFile(inputFile string) []string {
+
+	fileContents := []string{}
+
+	file, err := os.Open(inputFile)
+	defer file.Close()
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			line :=	scanner.Text()
 			fileContents = append(fileContents, line)
 		}
 	}
@@ -113,10 +138,47 @@ func MoveSubmarine(courseEntries []movement) (int, int) {
 
 }
 
+func CalculatePowerConsumption(diagnosticInput []string) (int, int) {
+
+	var inputAnalysis = []diagCounter{}
+	for i := 0; i < len(diagnosticInput[0]); i++ {
+		inputAnalysis = append(inputAnalysis, diagCounter{0,0})
+	}
+
+	for _, line := range diagnosticInput {
+		for idx, b := range line {
+			if string(b) == "1" {
+				inputAnalysis[idx].onesCount += 1
+			} else {
+				inputAnalysis[idx].zerosCount += 1
+			}
+	    }
+	}
+
+	var gammaBitString = ""
+	var epsilonBitString = ""
+	for _, bitCounts := range inputAnalysis {
+		if bitCounts.onesCount > bitCounts.zerosCount {
+			gammaBitString += "1"
+			epsilonBitString += "0"
+		} else {
+			gammaBitString += "0"
+			epsilonBitString += "1"
+		}
+	}
+	gammaRate, _ := strconv.ParseInt(gammaBitString, 2, 64)
+	epsilonRate, _ := strconv.ParseInt(epsilonBitString, 2, 64)
+
+	return int(gammaRate), int(epsilonRate)
+
+}
+
 func main() {
 
 	day_1_inputValues := getIntsFromFile("./day_1_input.txt")
 	day_2_inputValues := getMovementsFromFile("./day_2_input.txt")
+	day_3_inputValues := getDiagnosticsFromFile("./day_3_input.txt")
+
 	// day 1
 	numDepthIncreases := CountDepthIncreases(day_1_inputValues)
 	fmt.Printf("\nFound %d number of depth increases", numDepthIncreases)
@@ -128,4 +190,8 @@ func main() {
 	fmt.Printf("\nMultiplier value for movement: %d",
 		(horizontalMovement * verticalMovement))
 
+	// day 3
+	gammaRate, epsilonRate := CalculatePowerConsumption(day_3_inputValues)
+	fmt.Printf("\nPower Consumption is: %d",
+		(gammaRate * epsilonRate))
 }
