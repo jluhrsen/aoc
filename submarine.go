@@ -138,8 +138,17 @@ func MoveSubmarine(courseEntries []movement) (int, int) {
 
 }
 
-func CalculatePowerConsumption(diagnosticInput []string) (int, int) {
 
+func FindMostCommonBit(diagnosticInput []string, bitPosition int) int {
+	inputAnalysis := AnalyzeDiagnosticInputBitCounts(diagnosticInput)
+
+	if inputAnalysis[bitPosition].onesCount >= inputAnalysis[bitPosition].zerosCount {
+		return 1
+	}
+	return 0
+}
+
+func AnalyzeDiagnosticInputBitCounts(diagnosticInput []string) []diagCounter {
 	var inputAnalysis = []diagCounter{}
 	for i := 0; i < len(diagnosticInput[0]); i++ {
 		inputAnalysis = append(inputAnalysis, diagCounter{0,0})
@@ -152,8 +161,40 @@ func CalculatePowerConsumption(diagnosticInput []string) (int, int) {
 			} else {
 				inputAnalysis[idx].zerosCount += 1
 			}
-	    }
+		}
 	}
+
+	return inputAnalysis
+}
+
+func InputReducer(diagnosticInput []string, threshold string) (string, int) {
+
+    var mcb int
+
+	for i := 0; i < len(diagnosticInput[0]); i++ {
+		mcb = FindMostCommonBit(diagnosticInput, i)
+		tempBitStrings := []string{}
+		for _, bitString := range diagnosticInput {
+			tmpBit, _ := strconv.Atoi(string(bitString[i]))
+			if tmpBit == mcb && threshold == "max" {
+				tempBitStrings = append(tempBitStrings, bitString)
+			} else if tmpBit != mcb && threshold == "min" {
+				tempBitStrings = append(tempBitStrings, bitString)
+			}
+		}
+		if len(tempBitStrings) == 1 {
+            baseTenValue, _ := strconv.ParseInt(tempBitStrings[0], 2, 64)
+			return tempBitStrings[0], int(baseTenValue)
+		}
+		diagnosticInput = tempBitStrings
+	}
+
+    return "error", 0
+}
+
+func CalculatePowerConsumption(diagnosticInput []string) (int, int) {
+
+	inputAnalysis := AnalyzeDiagnosticInputBitCounts(diagnosticInput)
 
 	var gammaBitString = ""
 	var epsilonBitString = ""
@@ -194,4 +235,9 @@ func main() {
 	gammaRate, epsilonRate := CalculatePowerConsumption(day_3_inputValues)
 	fmt.Printf("\nPower Consumption is: %d",
 		(gammaRate * epsilonRate))
+	_, O2GeneratorRating := InputReducer(day_3_inputValues, "max")
+	_, CO2ScrubberRating := InputReducer(day_3_inputValues, "min")
+	// print LifeSupportRating
+	fmt.Printf("\nLife Support Rating is: %d", O2GeneratorRating * CO2ScrubberRating)
+
 }
