@@ -18,6 +18,17 @@ type bingoNumber struct {
 	selected bool
 }
 
+var initializedCard = bingoCard{
+	matchedLine: false,
+	numbers: [][]bingoNumber{
+		{{-1,false}, {-1,false}, {-1,false}, {-1,false}, {-1,false}},
+		{{-1,false}, {-1,false}, {-1,false}, {-1,false}, {-1,false}},
+		{{-1,false}, {-1,false}, {-1,false}, {-1,false}, {-1,false}},
+		{{-1,false}, {-1,false}, {-1,false}, {-1,false}, {-1,false}},
+		{{-1,false}, {-1,false}, {-1,false}, {-1,false}, {-1,false}},
+	},
+}
+
 func ReadBingoInput(inputFile string) ([]bingoCard, []int) {
 
 	bingoCards := []bingoCard{}
@@ -73,24 +84,40 @@ func ReadBingoInput(inputFile string) ([]bingoCard, []int) {
 }
 
 func ProcessBingoCards(bingoCards []bingoCard, bingoNumbers []int, exitOnWinner bool) (bingoCard, int) {
-	// caller needs to validate if the returned card is a winner or not since
-	// it's default value is the first card in the slice, just to initialize it
-	// also, if there are multiple winners, the last one will be what is returned
-	winner := bingoCards[0]
+	//  all cards will be marked.
+	//
+	//  the card returned will be:
+	//  - if no winner is found, then an initiazed card with unselecte numbers
+	//    all set to -1.
+	//  - exitOnWinner is true, the first winning card found is returned and.
+	//  - exitOnWinner is false, the last winning card that is found will be
+	//    returned.
+	winningCard := initializedCard
+	winningNumber := -1
 	for _, n := range bingoNumbers {
 		for idx, bc := range bingoCards {
-			MarkNumber(&bc, n)
-			if WinningCard(bc) == true {
+			// since we process all cards with all numbers we don't want to
+			// mark any numbers on a card that has already proven to be a
+			// winner
+			if bingoCards[idx].matchedLine != true {
+				MarkNumber(&bc, n)
+			}
+			if WinningCard(bc) == true && bingoCards[idx].matchedLine != true {
 				bingoCards[idx].matchedLine = true
-				winner = bingoCards[idx]
-				if exitOnWinner == true {
-					return winner, n
+				// if we want to find the last winning card, we need to keep
+				// updating winners as we find them
+				if exitOnWinner == true && winningNumber == -1 {
+					winningCard = bingoCards[idx]
+					winningNumber = n
+				} else if exitOnWinner == false {
+					winningCard = bingoCards[idx]
+					winningNumber = n
 				}
 			}
 		}
 	}
 
-	return winner, -1
+	return winningCard, winningNumber
 }
 
 func MarkNumber(card *bingoCard, num int) {

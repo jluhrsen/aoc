@@ -37,4 +37,10 @@ func main() {
 	unmarkedNumberSum := SumUnmarkedNumbers(winningCard)
 	winningScore := unmarkedNumberSum * finalNumberSelected
 	fmt.Printf("\nWinning score is %d", winningScore)
+	bingoCards, bingoNumbers = ReadBingoInput("./day_4_input.txt")
+	lastWinningCard, finalNumberSelected := ProcessBingoCards(bingoCards, bingoNumbers, false)
+	unmarkedNumberSum = SumUnmarkedNumbers(lastWinningCard)
+	winningScore = unmarkedNumberSum * finalNumberSelected
+	fmt.Printf("\nWinning score of last winning board is %d", winningScore)
+
 }

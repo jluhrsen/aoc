@@ -9,8 +9,8 @@ var bingoNumbers []int
 
 func TestReadBingoInput(t *testing.T) {
 	bingoCards, bingoNumbers := ReadBingoInput("./bingo_test_input.txt")
-	if len(bingoCards) != 6 {
-		t.Errorf("expected 6 bingo cards, but got %d", len(bingoCards))
+	if len(bingoCards) != 7 {
+		t.Errorf("expected 7 bingo cards, but got %d", len(bingoCards))
 	}
 	if len(bingoNumbers) != 27 {
 		t.Errorf("expected 27 bingo numbers, but got %d", len(bingoNumbers))
@@ -54,27 +54,30 @@ func TestWinningColumn(t *testing.T) {
 
 func TestWinningCard(t *testing.T) {
 	bingoCards, bingoNumbers := ReadBingoInput("./bingo_test_input.txt")
-
 	ProcessBingoCards(bingoCards, bingoNumbers, true)
 
-	if bingoCards[0].matchedLine == true {
+	if bingoCards[0].matchedLine != true {
 		t.Errorf("bingo card 1 should not be a winner")
 	}
-	if bingoCards[1].matchedLine == true {
+	if bingoCards[1].matchedLine != true {
 		t.Errorf("bingo card 2 should not be a winner")
 	}
-	if bingoCards[2].matchedLine == true {
+	if bingoCards[2].matchedLine != true {
 		t.Errorf("bingo card 3 should not be a winner")
 	}
 	if bingoCards[3].matchedLine != true {
 		t.Errorf("bingo card 4 should be a winner")
 	}
-	if bingoCards[4].matchedLine == true {
+	if bingoCards[4].matchedLine != true {
 		t.Errorf("bingo card 5 should not be a winner")
 	}
-	if bingoCards[5].matchedLine == true {
+	if bingoCards[5].matchedLine != true {
 		t.Errorf("bingo card 6 should not be a winner")
 	}
+	if bingoCards[6].matchedLine == true {
+		t.Errorf("bingo card 7 should not be a winner")
+	}
+
 
 }
 
@@ -102,6 +105,35 @@ func TestWinningScore(t *testing.T) {
     winningScore := unmarkedNumberSum * finalNumberSelected
 
 	if winningScore != 4512 {
-		t.Errorf("expected 188, but got %d", winningScore)
+		t.Errorf("expected 4512, but got %d", winningScore)
 	}
+}
+
+func TestFirstWinningCard(t *testing.T) {
+	bingoCards, bingoNumbers := ReadBingoInput("./bingo_test_input.txt")
+	// redue the cards to original AOC input
+	bingoCards = []bingoCard{bingoCards[0], bingoCards[1], bingoCards[2]}
+	winningCard, finalNumberSelected := ProcessBingoCards(bingoCards, bingoNumbers, true)
+
+	if winningCard.numbers[4][4].number != 7 {
+		t.Errorf("expected the last number in last row to be 7, but it was %d",
+			winningCard.numbers[4][4].number)
+	}
+	if finalNumberSelected != 24 {
+		t.Errorf("expected final number to be 24, but it was %d", finalNumberSelected)
+	}
+}
+
+func TestLastWinningCard(t *testing.T) {
+	bingoCards, bingoNumbers := ReadBingoInput("./bingo_test_input.txt")
+	winningCard, finalNumberSelected := ProcessBingoCards(bingoCards, bingoNumbers, false)
+
+	if winningCard.numbers[4][4].number != 30 {
+		t.Errorf("expected the last number in last row to be 30, but it was %d",
+			winningCard.numbers[4][4].number)
+	}
+    if finalNumberSelected != 8 {
+    	t.Errorf("expected final number to be 8, but it was %d", finalNumberSelected)
+	}
+
 }
